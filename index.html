@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AccessTalk - Real-Time Transcription for Accessibility</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Header with branding -->
+    <header class="app-header">
+        <div class="header-content">
+            <h1>AccessTalk</h1>
+            <p class="tagline">Real-time transcription for meetings, classrooms & conversations</p>
+        </div>
+        <button class="settings-btn" id="settingsBtn" aria-label="Open settings">
+            ⚙️
+        </button>
+    </header>
+
+    <!-- Main app container -->
+    <main class="app-container">
+        <!-- Status indicator -->
+        <div class="status-bar" id="statusBar">
+            <span class="status-indicator" id="statusIndicator"></span>
+            <span class="status-text" id="statusText">Ready</span>
+        </div>
+
+        <!-- Controls section -->
+        <section class="controls-section">
+            <button class="btn btn-primary" id="recordBtn">
+                <span class="btn-icon">🎤</span>
+                <span class="btn-text">Start Recording</span>
+            </button>
+
+            <button class="btn btn-secondary" id="overlayBtn" disabled>
+                <span class="btn-icon">🪟</span>
+                <span class="btn-text">Open Overlay</span>
+            </button>
+
+            <button class="btn btn-secondary" id="pauseBtn" disabled>
+                <span class="btn-icon">⏸️</span>
+                <span class="btn-text">Pause</span>
+            </button>
+        </section>
+
+        <!-- Live transcription display -->
+        <section class="transcription-section">
+            <div class="transcription-header">
+                <h2>Live Transcription</h2>
+                <span class="recording-time" id="recordingTime">00:00</span>
+            </div>
+            
+            <div class="transcription-display" id="transcriptionDisplay">
+                <p class="placeholder-text">Transcription will appear here...</p>
+            </div>
+
+            <!-- Word count and stats -->
+            <div class="transcription-stats">
+                <span>Words: <strong id="wordCount">0</strong></span>
+                <span>Language: <strong id="languageDisplay">English</strong></span>
+            </div>
+        </section>
+
+        <!-- AI Processing info -->
+        <section class="ai-section">
+            <div class="ai-status">
+                <h3>AI Processing</h3>
+                <div class="ai-indicator" id="aiIndicator">
+                    <span class="spinner"></span>
+                    <span id="aiStatusText">Idle</span>
+                </div>
+            </div>
+            
+            <div class="ai-info">
+                <p>Using Groq Whisper API for fast, accurate transcription</p>
+                <p class="info-detail">No filler words • Language detection • Speaker identification</p>
+            </div>
+        </section>
+
+        <!-- History section -->
+        <section class="history-section">
+            <h2>Recent Sessions</h2>
+            <div class="history-list" id="historyList">
+                <p class="placeholder-text">No sessions yet. Start recording to create one.</p>
+            </div>
+        </section>
+    </main>
+
+    <!-- Settings modal -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Settings</h2>
+                <button class="close-btn" id="closeSettingsBtn">&times;</button>
+            </div>
+            
+            <div class="modal-body">
+                <!-- API Key input -->
+                <div class="setting-group">
+                    <label for="groqApiKey">Groq API Key</label>
+                    <input 
+                        type="password" 
+                        id="groqApiKey" 
+                        placeholder="Enter your Groq API key"
+                        aria-describedby="apiKeyHelp"
+                    >
+                    <small id="apiKeyHelp">
+                        Get your key at <a href="https://console.groq.com" target="_blank">console.groq.com</a>
+                    </small>
+                </div>
+
+                <!-- Language settings -->
+                <div class="setting-group">
+                    <label for="languageSelect">Primary Language</label>
+                    <select id="languageSelect">
+                        <option value="en">English</option>
+                        <option value="es">Spanish</option>
+                        <option value="fr">French</option>
+                        <option value="de">German</option>
+                        <option value="zh">Chinese</option>
+                        <option value="auto">Auto-detect</option>
+                    </select>
+                </div>
+
+                <!-- Translation toggle -->
+                <div class="setting-group checkbox">
+                    <input 
+                        type="checkbox" 
+                        id="enableTranslation" 
+                        aria-label="Enable translation"
+                    >
+                    <label for="enableTranslation">Enable Translation (Phase 2)</label>
+                </div>
+
+                <!-- Filler words filter -->
+                <div class="setting-group checkbox">
+                    <input 
+                        type="checkbox" 
+                        id="filterFillerWords" 
+                        checked
+                        aria-label="Filter filler words"
+                    >
+                    <label for="filterFillerWords">Remove Filler Words (um, uh, like...)</label>
+                </div>
+
+                <!-- Speaker detection -->
+                <div class="setting-group checkbox">
+                    <input 
+                        type="checkbox" 
+                        id="enableSpeakerDetection" 
+                        checked
+                        aria-label="Enable speaker detection"
+                    >
+                    <label for="enableSpeakerDetection">Detect Multiple Speakers</label>
+                </div>
+
+                <!-- Overlay settings (Phase 2) -->
+                <div class="setting-group">
+                    <label for="overlayOpacity">Overlay Transparency (Phase 2)</label>
+                    <input 
+                        type="range" 
+                        id="overlayOpacity" 
+                        min="0.5" 
+                        max="1" 
+                        step="0.1" 
+                        value="0.9"
+                        disabled
+                    >
+                </div>
+
+                <!-- Data management -->
+                <div class="setting-group">
+                    <button class="btn btn-danger" id="clearDataBtn">
+                        Clear All Data
+                    </button>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-primary" id="saveSettingsBtn">Save Settings</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading indicator (hidden by default) -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="db.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
