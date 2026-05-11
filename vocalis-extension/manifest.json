@@ -19,7 +19,7 @@
   ],
   
   "action": {
-    "default_popup": "index.html",
+    "default_popup": "popup.html",
     "default_title": "Vocalis - Live Transcription"
   },
   
@@ -36,12 +36,12 @@
   "content_scripts": [
     {
       "matches": [
-        "https://chrome.google.com/*",
         "https://meet.google.com/*",
-        "https://docs.google.com/*",
-        "https://slides.google.com/*",
         "https://www.zoom.us/*",
-        "https://teams.microsoft.com/*"
+        "https://teams.microsoft.com/*",
+        "https://docs.google.com/*",
+        "https://slides.google.com/*"
+        
       ],
       "js": ["content.js"],
       "css": ["content-style.css"]

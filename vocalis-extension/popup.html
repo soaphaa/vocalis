@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vocalis Settings</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            width: 420px;
+            max-height: 650px;
+            background: #1a1f2e;
+            color: #e2e8f0;
+            font-family: 'Sora', sans-serif;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* CONTENT - SCROLLABLE */
+        .content {
+            padding: 24px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        /* SECTION */
+        .section {
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #94a3b8;
+            margin-bottom: 12px;
+            letter-spacing: 1px;
+        }
+
+        /* INPUT FIELDS */
+        .input-group {
+            margin-bottom: 12px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #e2e8f0;
+            margin-bottom: 6px;
+        }
+
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: 10px 12px;
+            background: #0f1419;
+            border: 1px solid #2d3748;
+            border-radius: 6px;
+            color: #e2e8f0;
+            font-family: 'Sora', sans-serif;
+            font-size: 13px;
+        }
+
+        .input-group input:focus,
+        .input-group select:focus {
+            outline: none;
+            border-color: #0066cc;
+            box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.15);
+            background: #1a1f2e;
+        }
+
+        .input-hint {
+            font-size: 11px;
+            color: #64748b;
+            margin-top: 4px;
+        }
+
+        .input-hint a {
+            color: #0066cc;
+            text-decoration: none;
+        }
+
+        /* CHECKBOXES */
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            background: #0f1419;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            border: 1px solid #2d3748;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            accent-color: #0066cc;
+        }
+
+        .checkbox-group label {
+            font-size: 13px;
+            color: #e2e8f0;
+            cursor: pointer;
+            margin: 0;
+        }
+
+        /* DIVIDER */
+        .divider {
+            height: 1px;
+            background: #2d3748;
+            margin: 16px 0;
+        }
+
+        /* FOOTER BAR - Like Ava meeting interface */
+        .footer-bar {
+            background: #0f1419;
+            border-top: 1px solid #2d3748;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .footer-left {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .icon-btn {
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: transparent;
+            color: #94a3b8;
+            font-size: 18px;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 150ms ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .icon-btn:hover {
+            background: #2d3748;
+            color: #e2e8f0;
+        }
+
+        .footer-right {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            background: #10b981;
+            border-radius: 50%;
+        }
+
+        .btn-end {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 150ms ease;
+        }
+
+        .btn-end:hover {
+            background: #dc2626;
+        }
+
+        .btn-open {
+            background: #0066cc;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 150ms ease;
+        }
+
+        .btn-open:hover {
+            background: #0052a3;
+        }
+
+        /* SCROLLBAR */
+        .content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .content::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .content::-webkit-scrollbar-thumb {
+            background: #2d3748;
+            border-radius: 3px;
+        }
+
+        .content::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+
+        /* STATUS MESSAGE */
+        .status-msg {
+            padding: 8px 12px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 6px;
+            font-size: 12px;
+            color: #10b981;
+            margin-bottom: 12px;
+            display: none;
+        }
+
+        .status-msg.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- CONTENT -->
+    <div class="content">
+        <div class="status-msg" id="statusMsg">✓ Settings saved</div>
+
+        <!-- API KEYS SECTION -->
+        <div class="section">
+            <div class="section-title">API Keys</div>
+
+            <div class="input-group">
+                <label>Groq API Key</label>
+                <input type="password" id="groqKey" placeholder="sk_...">
+                <div class="input-hint"><a href="https://console.groq.com" target="_blank">Get key →</a></div>
+            </div>
+
+            <div class="input-group">
+                <label>Google Calendar (Optional)</label>
+                <input type="password" id="calendarKey" placeholder="Your API key...">
+            </div>
+
+            <div class="input-group">
+                <label>Translation API (Optional)</label>
+                <input type="password" id="translateKey" placeholder="Your API key...">
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- LANGUAGES SECTION -->
+        <div class="section">
+            <div class="section-title">Languages</div>
+
+            <div class="input-group">
+                <label>Detect Language</label>
+                <select id="detectLang">
+                    <option value="auto">Auto-detect</option>
+                    <option value="en">English</option>
+                    <option value="es">Spanish</option>
+                    <option value="fr">French</option>
+                    <option value="de">German</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label>Translate To (Optional)</label>
+                <select id="translateLang">
+                    <option value="none">Disabled</option>
+                    <option value="en">English</option>
+                    <option value="es">Spanish</option>
+                    <option value="fr">French</option>
+                    <option value="de">German</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- FEATURES SECTION -->
+        <div class="section">
+            <div class="section-title">Features</div>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="enableMeetings" checked>
+                <label for="enableMeetings">Detect meeting dates</label>
+            </div>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="enableLiveStream" checked>
+                <label for="enableLiveStream">Live streaming mode</label>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER BAR - Like Ava meeting interface -->
+    <div class="footer-bar">
+        <div class="footer-left">
+            <button class="icon-btn" title="Settings">⚙️</button>
+            <button class="icon-btn" title="Microphone">🎤</button>
+            <button class="icon-btn" title="Help">❓</button>
+        </div>
+
+        <div class="footer-right">
+            <div class="status-dot"></div>
+            <button class="btn-open" id="btnOpen">Open App</button>
+            <button class="btn-end" id="btnSave">Save</button>
+        </div>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html>
