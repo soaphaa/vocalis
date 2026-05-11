@@ -20,7 +20,7 @@ btnSave.addEventListener('click', saveSettings);
 
 // Open app in new tab
 btnOpen.addEventListener('click', () => {
-    chrome.tabs.create({ url: 'https://vocalis-cyan.vercel.app/' });
+    chrome.tabs.create({ url: 'https://vocalis-9bxwp0mhz-soaphaas-projects.vercel.app/' });
 });
 
 // Load settings from Chrome storage
