@@ -1,0 +1,50 @@
+{
+  "manifest_version": 3,
+  "name": "Vocalis",
+  "version": "3.0.0",
+  "description": "Live transcription, translation, and meeting detection for any conversation",
+  
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "tabs",
+    "microphone",
+    "storage"
+  ],
+  
+  "host_permissions": [
+    "https://api.groq.com/*",
+    "https://www.googleapis.com/*",
+    "https://translation.googleapis.com/*"
+  ],
+  
+  "action": {
+    "default_popup": "index.html",
+    "default_title": "Vocalis - Live Transcription"
+  },
+  
+  "background": {
+    "service_worker": "background.js"
+  },
+  
+  "icons": {
+    "16": "images/icon-16.png",
+    "48": "images/icon-48.png",
+    "128": "images/icon-128.png"
+  },
+  
+  "content_scripts": [
+    {
+      "matches": [
+        "https://chrome.google.com/*",
+        "https://meet.google.com/*",
+        "https://docs.google.com/*",
+        "https://slides.google.com/*",
+        "https://www.zoom.us/*",
+        "https://teams.microsoft.com/*"
+      ],
+      "js": ["content.js"],
+      "css": ["content-style.css"]
+    }
+  ]
+}

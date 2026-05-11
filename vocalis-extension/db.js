@@ -393,9 +393,9 @@ const db = {
 document.addEventListener('DOMContentLoaded', async () => {
     try {
         await db.init();
-        console.log('Database module ready');
+        console.log('✅ Database module ready');
     } catch (error) {
-        console.error('Database failed:', error);
+        console.error('❌ Database initialization failed:', error);
     }
 });
 
