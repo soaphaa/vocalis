@@ -294,8 +294,7 @@ async function startRecording() {
         console.error('❌ Error starting recording:', error);
     }
 }
-    }
-}
+    
 
 function stopRecording() {
     mediaRecorder.stop();
