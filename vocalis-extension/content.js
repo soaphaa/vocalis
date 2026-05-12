@@ -1,10 +1,6 @@
 // content.js - Runs on meeting pages (Google Meet, Zoom, Teams, etc)
 // Creates floating button that opens Ava-style recording UI
 
-// GROQ API KEY
-const GROQ_API_KEY = '';
-const GROQ_API_URL = 'https://api.groq.com/openai/v1/audio/transcriptions';
-
 if (chrome && chrome.runtime) {
   console.log('Vocalis content script loaded on:', window.location.hostname);
   

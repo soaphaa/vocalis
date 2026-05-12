@@ -109,7 +109,6 @@ document.addEventListener('DOMContentLoaded', function() {
 // CONSTANTS
 const GROQ_API = 'https://api.groq.com/openai/v1/audio/transcriptions';
 const GOOGLE_CALENDAR_API = 'https://www.googleapis.com/calendar/v3';
-const DEFAULT_GROQ_KEY = '';
 
 // STATE
 let recording = false;
@@ -122,15 +121,10 @@ let currentText = '';
 let currentTranslation = '';
 let targetLanguage = 'none';
 
-// API KEYS - HYBRID APPROACH
-let groqKey = localStorage.getItem('groqKey') || DEFAULT_GROQ_KEY;
+// API KEYS - Users input these in settings
+let groqKey = localStorage.getItem('groqKey') || '';
 let calendarKey = localStorage.getItem('calendarKey') || '';
 let translateKey = localStorage.getItem('translateKey') || '';
-
-// Auto-save to localStorage if using default
-if (!localStorage.getItem('groqKey')) {
-    localStorage.setItem('groqKey', DEFAULT_GROQ_KEY);
-}
 
 // SETTINGS
 let enableMeetings = localStorage.getItem('enableMeetings') !== 'false';

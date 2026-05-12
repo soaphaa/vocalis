@@ -1,8 +1,5 @@
 // popup.js - Extension popup functionality
 
-// DEFAULT GROQ KEY
-const DEFAULT_GROQ_KEY = '';
-
 // Get elements
 const groqKey = document.getElementById('groqKey');
 const calendarKey = document.getElementById('calendarKey');
@@ -93,7 +90,7 @@ btnDyslexia.addEventListener('click', () => {
 function loadSettings() {
     chrome.storage.sync.get(
         {
-            groqKey: DEFAULT_GROQ_KEY,  // Default hybrid key
+            groqKey: '',
             calendarKey: '',
             translateKey: '',
             detectLang: 'auto',
@@ -112,11 +109,6 @@ function loadSettings() {
             translateLang.value = items.translateLang;
             enableMeetings.checked = items.enableMeetings;
             enableLiveStream.checked = items.enableLiveStream;
-            
-            // Auto-save default if first time
-            if (!items.groqKey || items.groqKey === DEFAULT_GROQ_KEY) {
-                chrome.storage.sync.set({groqKey: DEFAULT_GROQ_KEY});
-            }
         }
     );
 }
