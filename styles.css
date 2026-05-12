@@ -23,9 +23,171 @@ body {
     font-family: 'Sora', sans-serif;
     background: linear-gradient(135deg, var(--white) 0%, var(--gray-light) 100%);
     color: var(--black);
+    font-size: 16px;
+    line-height: 1.6;
+    letter-spacing: 0.3px;
 }
 
-/* MEETING NOTIFICATION */
+/* Accessibility: High contrast mode toggle */
+body.high-contrast {
+    background: var(--white);
+}
+
+body.high-contrast h1,
+body.high-contrast h2,
+body.high-contrast h3,
+body.high-contrast h4,
+body.high-contrast p,
+body.high-contrast button,
+body.high-contrast label {
+    color: var(--black);
+    font-weight: 600;
+}
+
+/* Dyslexia-friendly font option */
+body.dyslexia-mode {
+    font-family: 'OpenDyslexic', 'Arial', sans-serif;
+    letter-spacing: 0.5px;
+    word-spacing: 0.2em;
+}
+
+@import url('https://cdn.jsdelivr.net/npm/opendyslexic@1.0.10/index.css');
+
+/* CONTROL BAR (Like Ava) */
+.control-bar {
+    background: linear-gradient(135deg, #0f1419 0%, #1a202c 100%);
+    border-bottom: 2px solid #0066cc;
+    padding: 12px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    position: sticky;
+    top: 0;
+    z-index: 900;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.control-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.current-speaker {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 16px;
+    background: rgba(0, 102, 204, 0.1);
+    border-radius: 6px;
+    min-width: 200px;
+}
+
+.speaker-dot {
+    width: 12px;
+    height: 12px;
+    background: #10b981;
+    border-radius: 50%;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(1.2); }
+}
+
+#speakerName {
+    color: #e2e8f0;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.control-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.control-btn {
+    width: 36px;
+    height: 36px;
+    background: #2d3748;
+    border: 1px solid #475569;
+    color: #e2e8f0;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 150ms ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.control-btn:hover {
+    background: #0066cc;
+    border-color: #0066cc;
+    color: white;
+}
+
+.control-btn.active {
+    background: #0066cc;
+    border-color: #0066cc;
+    color: white;
+}
+
+.rec-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: rgba(16, 185, 129, 0.1);
+    border-radius: 6px;
+}
+
+.rec-status .status-dot {
+    width: 10px;
+    height: 10px;
+    background: #10b981;
+    border-radius: 50%;
+}
+
+.speaker-block {
+    padding: 12px 16px;
+    margin-bottom: 12px;
+    background: #f9fafb;
+    border-left: 4px solid #0066cc;
+    border-radius: 4px;
+    animation: slideIn 300ms ease;
+}
+
+.speaker-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    gap: 12px;
+}
+
+.speaker-label {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.speaker-time {
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+.speaker-text {
+    font-size: 16px;
+    line-height: 1.6;
+    color: #111827;
+    word-break: break-word;
+}
 .meeting-notification {
     position: fixed;
     top: 20px;

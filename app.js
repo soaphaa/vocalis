@@ -1,3 +1,108 @@
+// ========== SPEAKER IDENTIFICATION & ACCESSIBILITY ==========
+
+let speakers = [];
+let currentSpeaker = null;
+let speakerColors = ['#0066cc', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
+let textSizeMultiplier = 1;
+let isHighContrast = false;
+
+// Detect speaker changes
+function detectSpeakerChange(text) {
+    const sentenceCount = (text.match(/[.!?]/g) || []).length;
+    
+    if (!currentSpeaker || sentenceCount % 5 === 0) {
+        const newSpeaker = {
+            id: speakers.length + 1,
+            name: `Speaker ${speakers.length + 1}`,
+            color: speakerColors[speakers.length % speakerColors.length],
+            startTime: new Date(),
+            statements: []
+        };
+        
+        if (!speakers.find(s => s.id === newSpeaker.id)) {
+            speakers.push(newSpeaker);
+        }
+        currentSpeaker = newSpeaker;
+        updateSpeakerDisplay();
+    }
+    
+    return currentSpeaker;
+}
+
+function updateSpeakerDisplay() {
+    if (currentSpeaker) {
+        const speakerElement = document.getElementById('speakerName');
+        const speakerDot = document.getElementById('speakerDot');
+        
+        if (speakerElement) {
+            speakerElement.textContent = currentSpeaker.name;
+            speakerElement.style.color = currentSpeaker.color;
+        }
+        if (speakerDot) {
+            speakerDot.style.background = currentSpeaker.color;
+        }
+    }
+}
+
+function displayWithSpeaker(text, transcript) {
+    const speaker = detectSpeakerChange(text);
+    
+    const block = document.createElement('div');
+    block.className = 'speaker-block';
+    block.style.borderLeft = `4px solid ${speaker.color}`;
+    block.innerHTML = `
+        <div class="speaker-header">
+            <span class="speaker-label" style="color: ${speaker.color};">● ${speaker.name}</span>
+            <span class="speaker-time">${new Date().toLocaleTimeString()}</span>
+        </div>
+        <div class="speaker-text">${text}</div>
+    `;
+    
+    transcript.appendChild(block);
+    transcript.scrollTop = transcript.scrollHeight;
+}
+
+// ========== ACCESSIBILITY CONTROLS ==========
+
+document.addEventListener('DOMContentLoaded', function() {
+    // A+ Button
+    const btnTextSize = document.getElementById('btnTextSize');
+    if (btnTextSize) {
+        btnTextSize.addEventListener('click', () => {
+            textSizeMultiplier += 0.1;
+            if (textSizeMultiplier > 1.5) textSizeMultiplier = 1;
+            
+            const baseFontSize = 16;
+            const newSize = baseFontSize * textSizeMultiplier;
+            document.documentElement.style.fontSize = newSize + 'px';
+        });
+    }
+
+    // ◐ Button
+    const btnContrast = document.getElementById('btnContrast');
+    if (btnContrast) {
+        btnContrast.addEventListener('click', () => {
+            isHighContrast = !isHighContrast;
+            
+            if (isHighContrast) {
+                document.body.style.background = '#ffffff';
+                document.body.style.color = '#000000';
+                btnContrast.classList.add('active');
+            } else {
+                location.reload();
+            }
+        });
+    }
+
+    // Load OpenDyslexic font
+    const dyslexicFont = document.createElement('link');
+    dyslexicFont.href = 'https://cdn.jsdelivr.net/npm/opendyslexic@1.0.10/index.css';
+    dyslexicFont.rel = 'stylesheet';
+    document.head.appendChild(dyslexicFont);
+});
+
+// ========== END SPEAKER & ACCESSIBILITY ==========
+
 // VOCALIS - SIMPLE PHASE 3 APP
 // Live transcription, translation, meeting detection
 
@@ -16,14 +121,23 @@ let currentText = '';
 let currentTranslation = '';
 let targetLanguage = 'none';
 
-// API KEYS
+// API KEYS - Users input these in settings
 let groqKey = localStorage.getItem('groqKey') || '';
 let calendarKey = localStorage.getItem('calendarKey') || '';
 let translateKey = localStorage.getItem('translateKey') || '';
 
+// DEBUG: Log on startup
+console.log('=== VOCALIS STARTUP ===');
+console.log('✅ app.js loaded');
+console.log('groqKey from localStorage:', groqKey ? '✅ EXISTS (' + groqKey.substring(0, 20) + '...)' : '❌ EMPTY');
+
 // SETTINGS
 let enableMeetings = localStorage.getItem('enableMeetings') !== 'false';
 let enableLiveStream = localStorage.getItem('enableLiveStream') !== 'false';
+
+console.log('enableLiveStream:', enableLiveStream ? '✅ ON' : '❌ OFF');
+console.log('enableMeetings:', enableMeetings ? '✅ ON' : '❌ OFF');
+console.log('=== END STARTUP ===\n');
 
 // DOM ELEMENTS
 const btnRecord = document.getElementById('btnRecord');
@@ -61,10 +175,19 @@ const historyList = document.getElementById('historyList');
 
 // INITIALIZE
 document.addEventListener('DOMContentLoaded', function() {
-    // Load API keys
-    if (groqKey) inputGroqKey.value = groqKey;
-    if (calendarKey) inputCalendarKey.value = calendarKey;
-    if (translateKey) inputTranslateKey.value = translateKey;
+    // Load API keys and show as password (dots)
+    if (groqKey) {
+        inputGroqKey.value = groqKey;
+        inputGroqKey.type = 'password';  // Show as dots ••••••
+    }
+    if (calendarKey) {
+        inputCalendarKey.value = calendarKey;
+        inputCalendarKey.type = 'password';
+    }
+    if (translateKey) {
+        inputTranslateKey.value = translateKey;
+        inputTranslateKey.type = 'password';
+    }
     
     // Load settings
     checkMeetings.checked = enableMeetings;
@@ -101,6 +224,7 @@ async function toggleRecording() {
 
 async function startRecording() {
     try {
+        console.log('🎙️ START RECORDING - Getting microphone...');
         mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
         mediaRecorder = new MediaRecorder(mediaStream);
         audioChunks = [];
@@ -110,18 +234,25 @@ async function startRecording() {
         paused = false;
         recordStartTime = Date.now();
         
+        console.log('✅ Microphone acquired, starting MediaRecorder');
+        
         // Process audio in 1-second chunks for live streaming
         mediaRecorder.start(1000);
         
         // When each chunk is available
         mediaRecorder.ondataavailable = async (event) => {
+            console.log('📦 Audio chunk received, size:', event.data.size, 'bytes');
             audioChunks.push(event.data);
             
             // Live stream: process chunk immediately
             if (enableLiveStream) {
+                console.log('🔄 Live streaming enabled, transcribing chunk...');
                 const transcription = await transcribeChunk(event.data);
+                console.log('📝 Transcription result:', transcription ? '✅ ' + transcription : '❌ null/empty');
+                
                 if (transcription) {
                     currentText += (currentText ? ' ' : '') + transcription;
+                    console.log('💬 Current full text:', currentText);
                     displayLiveText(transcription);
                     
                     // Translate if enabled
@@ -137,13 +268,19 @@ async function startRecording() {
                     if (enableMeetings) {
                         checkForMeetings(transcription);
                     }
+                } else {
+                    console.warn('⚠️ Transcription was null/empty');
                 }
+            } else {
+                console.log('⚠️ Live streaming DISABLED - chunks not being processed');
             }
         };
         
         mediaRecorder.onstop = function() {
+            console.log('⏹️ Recording stopped');
             // If not live streaming, process now
             if (!enableLiveStream) {
+                console.log('Processing all audio at once...');
                 processAllAudio();
             }
         };
@@ -154,7 +291,9 @@ async function startRecording() {
         
     } catch (error) {
         alert('Microphone access denied');
-        console.error(error);
+        console.error('❌ Error starting recording:', error);
+    }
+}
     }
 }
 
@@ -179,25 +318,48 @@ function togglePause() {
 
 // TRANSCRIPTION
 async function transcribeChunk(chunk) {
-    if (!groqKey) return null;
+    // READ API KEY FRESH FROM LOCALSTORAGE EACH TIME (not just once at startup)
+    const freshKey = localStorage.getItem('groqKey') || '';
+    
+    console.log('🔑 Checking API key...');
+    console.log('freshKey exists:', freshKey ? '✅ YES (' + freshKey.substring(0, 15) + '...)' : '❌ NO');
+    
+    if (!freshKey) {
+        console.error('❌ CRITICAL: Groq API key not set. Go to Settings and add your key.');
+        return null;
+    }
     
     try {
+        console.log('📤 Creating FormData and sending to Groq API...');
         const formData = new FormData();
         formData.append('file', chunk, 'audio.webm');
         formData.append('model', 'whisper-large-v3-turbo');
         
+        console.log('🌐 Fetching from:', GROQ_API);
         const response = await fetch(GROQ_API, {
             method: 'POST',
-            headers: { 'Authorization': `Bearer ${groqKey}` },
+            headers: { 'Authorization': `Bearer ${freshKey}` },  // USE FRESH KEY
             body: formData
         });
         
-        if (!response.ok) return null;
+        console.log('📥 Response status:', response.status, response.statusText);
+        
+        if (!response.ok) {
+            console.error('❌ API returned error:', response.status, response.statusText);
+            const errorText = await response.text();
+            console.error('Error details:', errorText);
+            return null;
+        }
+        
         const data = await response.json();
+        console.log('✅ Got response from Groq:', data);
+        console.log('📝 Transcribed text:', data.text || '(empty)');
+        
         return data.text;
         
     } catch (error) {
-        console.error('Transcription error:', error);
+        console.error('❌ Exception in transcribeChunk:', error.message);
+        console.error('Full error:', error);
         return null;
     }
 }
@@ -214,12 +376,22 @@ async function processAllAudio() {
 
 // DISPLAY
 function displayLiveText(text) {
+    console.log('🎨 displayLiveText called with:', text);
+    console.log('transcriptOriginal element exists:', transcriptOriginal ? '✅ YES' : '❌ NO');
+    
     const p = document.createElement('p');
     p.textContent = text;
     p.style.color = '#0066cc';
     p.style.fontWeight = '500';
+    
+    if (!transcriptOriginal) {
+        console.error('❌ CRITICAL: transcriptOriginal element not found!');
+        return;
+    }
+    
     transcriptOriginal.appendChild(p);
     transcriptOriginal.scrollTop = transcriptOriginal.scrollHeight;
+    console.log('✅ Text added to DOM, total items:', transcriptOriginal.children.length);
 }
 
 function displayLiveTranslation(text) {
@@ -398,17 +570,27 @@ function closeSettings() {
 }
 
 function saveSettings() {
+    console.log('💾 saveSettings called');
     groqKey = inputGroqKey.value;
     calendarKey = inputCalendarKey.value;
     translateKey = inputTranslateKey.value;
     enableMeetings = checkMeetings.checked;
     enableLiveStream = checkLiveStream.checked;
     
+    console.log('Saving to localStorage:');
+    console.log('  groqKey:', groqKey ? '✅ ' + groqKey.substring(0, 20) + '...' : '❌ empty');
+    console.log('  enableMeetings:', enableMeetings);
+    console.log('  enableLiveStream:', enableLiveStream);
+    
     localStorage.setItem('groqKey', groqKey);
     localStorage.setItem('calendarKey', calendarKey);
     localStorage.setItem('translateKey', translateKey);
     localStorage.setItem('enableMeetings', enableMeetings);
     localStorage.setItem('enableLiveStream', enableLiveStream);
+    
+    console.log('✅ All settings saved to localStorage');
+    console.log('Verify - reading back:');
+    console.log('  groqKey from localStorage:', localStorage.getItem('groqKey') ? '✅ exists' : '❌ missing');
     
     closeSettings();
     alert('Saved!');

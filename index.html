@@ -18,12 +18,41 @@
         </div>
     </div>
 
+    <!-- Top Control Bar (Like Ava) -->
+    <div class="control-bar" id="controlBar" style="display: none;">
+        <div class="control-left">
+            <div class="current-speaker" id="currentSpeaker">
+                <div class="speaker-dot" id="speakerDot"></div>
+                <span id="speakerName">Waiting for speaker...</span>
+            </div>
+        </div>
+
+        <div class="control-right">
+            <!-- Accessibility Controls -->
+            <button class="control-btn" id="btnTextSize" title="Increase text size" aria-label="Text size controls">
+                A+
+            </button>
+            <button class="control-btn" id="btnContrast" title="High contrast mode" aria-label="Toggle high contrast">
+                ◐
+            </button>
+            <button class="control-btn" id="btnDyslexia" title="Dyslexia font" aria-label="Toggle dyslexia-friendly font">
+                D
+            </button>
+            
+            <!-- Recording Status -->
+            <div class="rec-status">
+                <div class="status-dot" id="statusDotBar"></div>
+                <span id="statusLabel">Ready</span>
+            </div>
+        </div>
+    </div>
+
     <!-- Navigation -->
     <nav class="navbar">
         <div class="nav-container">
             <h1 class="logo">vocalis</h1>
             <span class="version">phase 3</span>
-            <button class="btn-settings" id="btnSettings">Settings</button>
+            <button class="btn-settings" id="btnSettings">⚙️</button>
         </div>
     </nav>
 
@@ -133,6 +162,18 @@
                     <div class="form-group">
                         <label>Google Calendar Key (Optional)</label>
                         <input type="password" id="inputCalendarKey" placeholder="Your key...">
+                        <small><a href="https://console.cloud.google.com" target="_blank">Get Google Calendar API key →</a></small>
+                        <details style="margin-top: 8px; font-size: 12px; color: #64748b;">
+                            <summary style="cursor: pointer; font-weight: 600;">How to get Google Calendar API key</summary>
+                            <div style="margin-top: 8px; padding: 12px; background: #f3f4f6; border-radius: 6px; color: #111827;">
+                                1. Go to <a href="https://console.cloud.google.com" target="_blank">Google Cloud Console</a><br>
+                                2. Create new project<br>
+                                3. Enable "Google Calendar API"<br>
+                                4. Go to "Credentials"<br>
+                                5. Create "OAuth 2.0 Client ID" (Desktop app)<br>
+                                6. Copy the key
+                            </div>
+                        </details>
                     </div>
 
                     <div class="form-group">
@@ -197,6 +238,7 @@
 
     <!-- Scripts -->
     <script src="db.js"></script>
+    <script src="accessibility.js"></script>
     <script src="app.js"></script>
 </body>
 </html>
