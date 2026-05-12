@@ -1,3 +1,108 @@
+// ========== SPEAKER IDENTIFICATION & ACCESSIBILITY ==========
+
+let speakers = [];
+let currentSpeaker = null;
+let speakerColors = ['#0066cc', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
+let textSizeMultiplier = 1;
+let isHighContrast = false;
+
+// Detect speaker changes
+function detectSpeakerChange(text) {
+    const sentenceCount = (text.match(/[.!?]/g) || []).length;
+    
+    if (!currentSpeaker || sentenceCount % 5 === 0) {
+        const newSpeaker = {
+            id: speakers.length + 1,
+            name: `Speaker ${speakers.length + 1}`,
+            color: speakerColors[speakers.length % speakerColors.length],
+            startTime: new Date(),
+            statements: []
+        };
+        
+        if (!speakers.find(s => s.id === newSpeaker.id)) {
+            speakers.push(newSpeaker);
+        }
+        currentSpeaker = newSpeaker;
+        updateSpeakerDisplay();
+    }
+    
+    return currentSpeaker;
+}
+
+function updateSpeakerDisplay() {
+    if (currentSpeaker) {
+        const speakerElement = document.getElementById('speakerName');
+        const speakerDot = document.getElementById('speakerDot');
+        
+        if (speakerElement) {
+            speakerElement.textContent = currentSpeaker.name;
+            speakerElement.style.color = currentSpeaker.color;
+        }
+        if (speakerDot) {
+            speakerDot.style.background = currentSpeaker.color;
+        }
+    }
+}
+
+function displayWithSpeaker(text, transcript) {
+    const speaker = detectSpeakerChange(text);
+    
+    const block = document.createElement('div');
+    block.className = 'speaker-block';
+    block.style.borderLeft = `4px solid ${speaker.color}`;
+    block.innerHTML = `
+        <div class="speaker-header">
+            <span class="speaker-label" style="color: ${speaker.color};">● ${speaker.name}</span>
+            <span class="speaker-time">${new Date().toLocaleTimeString()}</span>
+        </div>
+        <div class="speaker-text">${text}</div>
+    `;
+    
+    transcript.appendChild(block);
+    transcript.scrollTop = transcript.scrollHeight;
+}
+
+// ========== ACCESSIBILITY CONTROLS ==========
+
+document.addEventListener('DOMContentLoaded', function() {
+    // A+ Button
+    const btnTextSize = document.getElementById('btnTextSize');
+    if (btnTextSize) {
+        btnTextSize.addEventListener('click', () => {
+            textSizeMultiplier += 0.1;
+            if (textSizeMultiplier > 1.5) textSizeMultiplier = 1;
+            
+            const baseFontSize = 16;
+            const newSize = baseFontSize * textSizeMultiplier;
+            document.documentElement.style.fontSize = newSize + 'px';
+        });
+    }
+
+    // ◐ Button
+    const btnContrast = document.getElementById('btnContrast');
+    if (btnContrast) {
+        btnContrast.addEventListener('click', () => {
+            isHighContrast = !isHighContrast;
+            
+            if (isHighContrast) {
+                document.body.style.background = '#ffffff';
+                document.body.style.color = '#000000';
+                btnContrast.classList.add('active');
+            } else {
+                location.reload();
+            }
+        });
+    }
+
+    // Load OpenDyslexic font
+    const dyslexicFont = document.createElement('link');
+    dyslexicFont.href = 'https://cdn.jsdelivr.net/npm/opendyslexic@1.0.10/index.css';
+    dyslexicFont.rel = 'stylesheet';
+    document.head.appendChild(dyslexicFont);
+});
+
+// ========== END SPEAKER & ACCESSIBILITY ==========
+
 // VOCALIS - SIMPLE PHASE 3 APP
 // Live transcription, translation, meeting detection
 
@@ -17,7 +122,7 @@ let currentTranslation = '';
 let targetLanguage = 'none';
 
 // API KEYS
-let groqKey = localStorage.getItem('groqKey') || '';
+let groqKey = '' || localStorage.getItem('groqKey') || '';
 let calendarKey = localStorage.getItem('calendarKey') || '';
 let translateKey = localStorage.getItem('translateKey') || '';
 
