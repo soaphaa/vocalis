@@ -293,7 +293,13 @@ function togglePause() {
 
 // TRANSCRIPTION
 async function transcribeChunk(chunk) {
-    if (!groqKey) return null;
+    // READ API KEY FRESH FROM LOCALSTORAGE EACH TIME
+    const freshKey = localStorage.getItem('groqKey') || '';
+    
+    if (!freshKey) {
+        console.error('❌ Groq API key not set. Go to Settings and add your key.');
+        return null;
+    }
     
     try {
         const formData = new FormData();
@@ -302,7 +308,7 @@ async function transcribeChunk(chunk) {
         
         const response = await fetch(GROQ_API, {
             method: 'POST',
-            headers: { 'Authorization': `Bearer ${groqKey}` },
+            headers: { 'Authorization': `Bearer ${freshKey}` }, 
             body: formData
         });
         
@@ -586,6 +592,20 @@ async function loadHistory() {
     } catch (error) {
         console.error(error);
     }
+}
+
+// Add to app.js
+async function translateText(text, targetLang) {
+    const response = await fetch('https://libretranslate.de/translate', {
+        method: 'POST',
+        body: JSON.stringify({
+            q: text,
+            source: 'auto',
+            target: targetLang  // 'es', 'fr', 'de', etc.
+        }),
+        headers: { 'Content-Type': 'application/json' }
+    });
+    return (await response.json()).translatedText;
 }
 
 console.log('Vocalis Phase 3 loaded');
