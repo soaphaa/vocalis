@@ -1,177 +1,74 @@
-// popup.js - Extension popup functionality
+// popup.js - Settings handler
 
-console.log('=== VOCALIS EXTENSION POPUP ===');
-console.log('✅ popup.js loaded');
-
-// Get elements
-const groqKey = document.getElementById('groqKey');
-const calendarKey = document.getElementById('calendarKey');
-const translateKey = document.getElementById('translateKey');
-const detectLang = document.getElementById('detectLang');
-const translateLang = document.getElementById('translateLang');
-const enableMeetings = document.getElementById('enableMeetings');
-const enableLiveStream = document.getElementById('enableLiveStream');
+const langSelect = document.getElementById('langSelect');
+const enableLiveCaption = document.getElementById('enableLiveCaption');
+const enableAutoExport = document.getElementById('enableAutoExport');
 const btnSave = document.getElementById('btnSave');
-const btnClose = document.getElementById('btnClose');
-const statusMsg = document.getElementById('statusMsg');
+const btnA = document.getElementById('btnA');
+const btnCon = document.getElementById('btnCon');
+const status = document.getElementById('status');
 
-// Accessibility controls
-const btnTextSize = document.getElementById('btnTextSize');
-const btnContrast = document.getElementById('btnContrast');
-const btnDyslexia = document.getElementById('btnDyslexia');
+let fontSize = 100;
+let highContrast = false;
 
-let textSizeMultiplier = 1;
-let isHighContrast = false;
-let isDyslexiaMode = false;
-
-// Load settings on popup open
+// Load settings
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('📖 popup.js DOMContentLoaded');
-    loadSettings();
+    chrome.storage.sync.get({
+        language: 'en-US',
+        liveCaption: true,
+        autoExport: false
+    }, (items) => {
+        langSelect.value = items.language;
+        enableLiveCaption.checked = items.liveCaption;
+        enableAutoExport.checked = items.autoExport;
+    });
 });
 
-// Save settings when button clicked
-btnSave.addEventListener('click', saveSettings);
+// Save settings
+btnSave.addEventListener('click', () => {
+    const settings = {
+        language: langSelect.value,
+        liveCaption: enableLiveCaption.checked,
+        autoExport: enableAutoExport.checked
+    };
 
-// Close popup
-btnClose.addEventListener('click', () => {
-    window.close();
+    chrome.storage.sync.set(settings, () => {
+        status.textContent = 'Settings saved';
+        status.className = 'status success';
+        setTimeout(() => {
+            status.className = 'status';
+        }, 2000);
+    });
 });
 
-// ========== ACCESSIBILITY CONTROLS ==========
-
-// A+ Button (Text Size)
-btnTextSize.addEventListener('click', () => {
-    textSizeMultiplier += 0.1;
-    if (textSizeMultiplier > 1.5) textSizeMultiplier = 1;
-    
-    const baseFontSize = 13;
-    const newSize = baseFontSize * textSizeMultiplier;
-    document.body.style.fontSize = newSize + 'px';
+// Accessibility - Text size
+btnA.addEventListener('click', () => {
+    fontSize += 10;
+    if (fontSize > 150) fontSize = 100;
+    document.body.style.fontSize = (fontSize / 100) * 13 + 'px';
 });
 
-// ◐ Button (High Contrast)
-btnContrast.addEventListener('click', () => {
-    isHighContrast = !isHighContrast;
-    
-    if (isHighContrast) {
+// Accessibility - Contrast
+btnCon.addEventListener('click', () => {
+    highContrast = !highContrast;
+    if (highContrast) {
         document.body.style.background = '#ffffff';
         document.body.style.color = '#000000';
-        document.querySelectorAll('input, select, button, label').forEach(el => {
+        document.querySelectorAll('select, button').forEach(el => {
+            el.style.background = '#f5f5f5';
             el.style.color = '#000000';
+            el.style.borderColor = '#000000';
         });
-        btnContrast.classList.add('active');
+        btnCon.style.background = '#000000';
+        btnCon.style.color = '#ffffff';
     } else {
         document.body.style.background = '#0f1419';
         document.body.style.color = '#e2e8f0';
-        btnContrast.classList.remove('active');
-        location.reload();
+        document.querySelectorAll('select, button').forEach(el => {
+            el.style.background = '#2d3748';
+            el.style.color = '#e2e8f0';
+        });
+        btnCon.style.background = '#2d3748';
+        btnCon.style.color = '#e2e8f0';
     }
 });
-
-// D Button (Dyslexia Font)
-btnDyslexia.addEventListener('click', () => {
-    isDyslexiaMode = !isDyslexiaMode;
-    
-    if (isDyslexiaMode) {
-        document.body.style.fontFamily = "'OpenDyslexic', 'Arial', sans-serif";
-        document.body.style.letterSpacing = '0.5px';
-        btnDyslexia.classList.add('active');
-        
-        // Load OpenDyslexic font
-        const link = document.createElement('link');
-        link.href = 'https://cdn.jsdelivr.net/npm/opendyslexic@1.0.10/index.css';
-        link.rel = 'stylesheet';
-        document.head.appendChild(link);
-    } else {
-        document.body.style.fontFamily = "'Sora', sans-serif";
-        document.body.style.letterSpacing = 'normal';
-        btnDyslexia.classList.remove('active');
-    }
-});
-
-// ========== SETTINGS FUNCTIONS ==========
-
-// Load settings from Chrome storage
-function loadSettings() {
-    console.log('📂 loadSettings called');
-    chrome.storage.sync.get(
-        {
-            groqKey: '',
-            calendarKey: '',
-            translateKey: '',
-            detectLang: 'auto',
-            translateLang: 'none',
-            enableMeetings: true,
-            enableLiveStream: true
-        },
-        (items) => {
-            console.log('✅ Settings loaded from Chrome storage:');
-            console.log('  groqKey:', items.groqKey ? '✅ ' + items.groqKey.substring(0, 20) + '...' : '❌ empty');
-            console.log('  enableMeetings:', items.enableMeetings);
-            console.log('  enableLiveStream:', items.enableLiveStream);
-            
-            groqKey.value = items.groqKey;
-            groqKey.type = 'password';  // Show as dots ••••••
-            calendarKey.value = items.calendarKey;
-            calendarKey.type = 'password';
-            translateKey.value = items.translateKey;
-            translateKey.type = 'password';
-            detectLang.value = items.detectLang;
-            translateLang.value = items.translateLang;
-            enableMeetings.checked = items.enableMeetings;
-            enableLiveStream.checked = items.enableLiveStream;
-            
-            console.log('✅ UI updated with loaded settings');
-        }
-    );
-}
-
-// Save settings to Chrome storage
-function saveSettings() {
-    console.log('💾 saveSettings called');
-    console.log('  groqKey value:', groqKey.value ? '✅ ' + groqKey.value.substring(0, 20) + '...' : '❌ empty');
-    
-    if (!groqKey.value) {
-        showStatus('⚠️ Groq API key is required', false);
-        return;
-    }
-
-    const settings = {
-        groqKey: groqKey.value,
-        calendarKey: calendarKey.value,
-        translateKey: translateKey.value,
-        detectLang: detectLang.value,
-        translateLang: translateLang.value,
-        enableMeetings: enableMeetings.checked,
-        enableLiveStream: enableLiveStream.checked
-    };
-
-    console.log('Saving to Chrome storage:', settings);
-    
-    chrome.storage.sync.set(settings, () => {
-        console.log('✅ Settings saved to Chrome storage');
-        showStatus('✓ Settings saved', true);
-        
-        // Hide message after 2 seconds
-        setTimeout(() => {
-            statusMsg.classList.remove('show');
-        }, 2000);
-    });
-}
-
-// Show status message
-function showStatus(message, success) {
-    statusMsg.textContent = message;
-    statusMsg.classList.add('show');
-    
-    if (!success) {
-        statusMsg.style.background = 'rgba(239, 68, 68, 0.1)';
-        statusMsg.style.borderColor = 'rgba(239, 68, 68, 0.3)';
-        statusMsg.style.color = '#ef4444';
-    } else {
-        statusMsg.style.background = 'rgba(16, 185, 129, 0.1)';
-        statusMsg.style.borderColor = 'rgba(16, 185, 129, 0.3)';
-        statusMsg.style.color = '#10b981';
-    }
-}

@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vocalis</title>
-    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -13,139 +12,70 @@
         }
 
         body {
-            font-family: 'Sora', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: #0f1419;
             color: #e2e8f0;
-            width: 500px;
-            max-height: 700px;
+            width: 480px;
+            min-height: 400px;
             display: flex;
             flex-direction: column;
         }
 
-        /* AVA-STYLE TOP BAR */
         .top-bar {
             background: linear-gradient(135deg, #0f1419 0%, #1a202c 100%);
             border-bottom: 2px solid #0066cc;
-            padding: 12px 16px;
+            padding: 14px 16px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 16px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
             flex-shrink: 0;
         }
 
-        .bar-left {
-            display: flex;
-            align-items: center;
-            gap: 12px;
+        .title {
+            font-weight: 600;
+            font-size: 14px;
         }
 
-        .speaker-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 8px 16px;
-            background: rgba(0, 102, 204, 0.1);
-            border-radius: 6px;
-        }
-
-        .speaker-dot {
-            width: 12px;
-            height: 12px;
-            background: #10b981;
-            border-radius: 50%;
-            animation: pulse 1.5s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.7; transform: scale(1.2); }
-        }
-
-        .bar-center {
+        .top-controls {
             display: flex;
             gap: 8px;
-            align-items: center;
         }
 
-        .control-btn {
-            width: 36px;
-            height: 36px;
+        .btn-small {
+            width: 32px;
+            height: 32px;
             background: #2d3748;
             border: 1px solid #475569;
             color: #e2e8f0;
-            border-radius: 6px;
+            border-radius: 4px;
             cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            transition: all 150ms ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .control-btn:hover {
-            background: #0066cc;
-            border-color: #0066cc;
-            color: white;
-        }
-
-        .control-btn.active {
-            background: #0066cc;
-            border-color: #0066cc;
-            color: white;
-        }
-
-        .bar-right {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .status-indicator {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 12px;
-            background: rgba(16, 185, 129, 0.1);
-            border-radius: 6px;
-        }
-
-        .status-dot {
-            width: 10px;
-            height: 10px;
-            background: #10b981;
-            border-radius: 50%;
-        }
-
-        .status-text {
-            color: #10b981;
             font-size: 12px;
             font-weight: 600;
+            transition: all 120ms ease;
         }
 
-        .btn-end {
-            background: #ef4444;
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 150ms ease;
+        .btn-small:hover {
+            background: #0066cc;
+            border-color: #0066cc;
         }
 
-        .btn-end:hover {
-            background: #dc2626;
-        }
-
-        /* SETTINGS PANEL */
-        .settings-panel {
+        .content {
             overflow-y: auto;
             padding: 20px;
             flex: 1;
+        }
+
+        .section {
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
         }
 
         .form-group {
@@ -160,7 +90,6 @@
             margin-bottom: 6px;
         }
 
-        .form-group input,
         .form-group select {
             width: 100%;
             padding: 10px 12px;
@@ -168,26 +97,12 @@
             border: 1px solid #2d3748;
             border-radius: 6px;
             color: #e2e8f0;
-            font-family: 'Sora', sans-serif;
             font-size: 13px;
         }
 
-        .form-group input:focus,
         .form-group select:focus {
             outline: none;
             border-color: #0066cc;
-            box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.15);
-        }
-
-        .form-hint {
-            font-size: 11px;
-            color: #64748b;
-            margin-top: 4px;
-        }
-
-        .form-hint a {
-            color: #0066cc;
-            text-decoration: none;
         }
 
         .checkbox-group {
@@ -202,7 +117,7 @@
             cursor: pointer;
         }
 
-        .checkbox-group input[type="checkbox"] {
+        .checkbox-group input {
             width: 16px;
             height: 16px;
             cursor: pointer;
@@ -214,6 +129,7 @@
             color: #e2e8f0;
             cursor: pointer;
             margin: 0;
+            flex: 1;
         }
 
         .btn-save {
@@ -226,106 +142,69 @@
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 150ms ease;
-            margin-top: 10px;
+            transition: all 120ms ease;
         }
 
         .btn-save:hover {
             background: #0052a3;
         }
 
-        .settings-panel::-webkit-scrollbar {
+        .status {
+            padding: 10px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            margin-bottom: 16px;
+            display: none;
+        }
+
+        .status.success {
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .divider {
+            height: 1px;
+            background: #2d3748;
+            margin: 16px 0;
+        }
+
+        .content::-webkit-scrollbar {
             width: 6px;
         }
 
-        .settings-panel::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .settings-panel::-webkit-scrollbar-thumb {
+        .content::-webkit-scrollbar-thumb {
             background: #2d3748;
             border-radius: 3px;
-        }
-
-        .settings-panel::-webkit-scrollbar-thumb:hover {
-            background: #475569;
         }
     </style>
 </head>
 <body>
-    <!-- AVA-STYLE TOP CONTROL BAR -->
     <div class="top-bar">
-        <div class="bar-left">
-            <div class="speaker-info">
-                <div class="speaker-dot"></div>
-                <span style="font-size: 13px; font-weight: 600;">🎤 Vocalis</span>
-            </div>
-        </div>
-
-        <div class="bar-center">
-            <button class="control-btn" id="btnTextSize" title="Increase text size">A+</button>
-            <button class="control-btn" id="btnContrast" title="High contrast mode">◐</button>
-            <button class="control-btn" id="btnDyslexia" title="Dyslexia font">D</button>
-        </div>
-
-        <div class="bar-right">
-            <div class="status-indicator">
-                <div class="status-dot"></div>
-                <span class="status-text">Ready</span>
-            </div>
-            <button class="btn-end" id="btnClose">✕</button>
+        <div class="title">Vocalis Settings</div>
+        <div class="top-controls">
+            <button class="btn-small" id="btnA" title="Increase text size">A+</button>
+            <button class="btn-small" id="btnCon" title="High contrast">Con</button>
         </div>
     </div>
 
-    <!-- SETTINGS PANEL -->
-    <div class="settings-panel">
-        <div class="status-msg" id="statusMsg">✓ Settings saved</div>
+    <div class="content">
+        <div class="status" id="status"></div>
 
         <div class="section">
-            <div class="section-title">API Keys</div>
-
+            <div class="section-title">Language Settings</div>
             <div class="form-group">
-                <label>Groq API Key</label>
-                <input type="password" id="groqKey" placeholder="sk_...">
-                <div class="form-hint"><a href="https://console.groq.com" target="_blank">Get key →</a></div>
-            </div>
-
-            <div class="form-group">
-                <label>Google Calendar (Optional)</label>
-                <input type="password" id="calendarKey" placeholder="Your API key...">
-                <div class="form-hint"><a href="https://console.cloud.google.com" target="_blank">Get key →</a></div>
-            </div>
-
-            <div class="form-group">
-                <label>Translation API (Optional)</label>
-                <input type="password" id="translateKey" placeholder="Your API key...">
-            </div>
-        </div>
-
-        <div class="divider"></div>
-
-        <div class="section">
-            <div class="section-title">Languages</div>
-
-            <div class="form-group">
-                <label>Detect Language</label>
-                <select id="detectLang">
-                    <option value="auto">Auto-detect</option>
-                    <option value="en">English</option>
-                    <option value="es">Spanish</option>
-                    <option value="fr">French</option>
-                    <option value="de">German</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label>Translate To (Optional)</label>
-                <select id="translateLang">
-                    <option value="none">Disabled</option>
-                    <option value="en">English</option>
-                    <option value="es">Spanish</option>
-                    <option value="fr">French</option>
-                    <option value="de">German</option>
+                <label for="langSelect">Transcription Language</label>
+                <select id="langSelect">
+                    <option value="en-US">English (US)</option>
+                    <option value="en-GB">English (UK)</option>
+                    <option value="es-ES">Spanish</option>
+                    <option value="fr-FR">French</option>
+                    <option value="de-DE">German</option>
+                    <option value="it-IT">Italian</option>
+                    <option value="ja-JP">Japanese</option>
+                    <option value="pt-BR">Portuguese</option>
+                    <option value="zh-CN">Mandarin</option>
                 </select>
             </div>
         </div>
@@ -334,15 +213,13 @@
 
         <div class="section">
             <div class="section-title">Features</div>
-
             <div class="checkbox-group">
-                <input type="checkbox" id="enableMeetings" checked>
-                <label for="enableMeetings">Detect meeting dates</label>
+                <input type="checkbox" id="enableLiveCaption" checked>
+                <label for="enableLiveCaption">Live captions</label>
             </div>
-
             <div class="checkbox-group">
-                <input type="checkbox" id="enableLiveStream" checked>
-                <label for="enableLiveStream">Live streaming mode</label>
+                <input type="checkbox" id="enableAutoExport" unchecked>
+                <label for="enableAutoExport">Auto-export transcript</label>
             </div>
         </div>
 
