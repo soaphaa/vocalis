@@ -126,9 +126,18 @@ let groqKey = localStorage.getItem('groqKey') || '';
 let calendarKey = localStorage.getItem('calendarKey') || '';
 let translateKey = localStorage.getItem('translateKey') || '';
 
+// DEBUG: Log on startup
+console.log('=== VOCALIS STARTUP ===');
+console.log('✅ app.js loaded');
+console.log('groqKey from localStorage:', groqKey ? '✅ EXISTS (' + groqKey.substring(0, 20) + '...)' : '❌ EMPTY');
+
 // SETTINGS
 let enableMeetings = localStorage.getItem('enableMeetings') !== 'false';
 let enableLiveStream = localStorage.getItem('enableLiveStream') !== 'false';
+
+console.log('enableLiveStream:', enableLiveStream ? '✅ ON' : '❌ OFF');
+console.log('enableMeetings:', enableMeetings ? '✅ ON' : '❌ OFF');
+console.log('=== END STARTUP ===\n');
 
 // DOM ELEMENTS
 const btnRecord = document.getElementById('btnRecord');
@@ -215,6 +224,7 @@ async function toggleRecording() {
 
 async function startRecording() {
     try {
+        console.log('🎙️ START RECORDING - Getting microphone...');
         mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
         mediaRecorder = new MediaRecorder(mediaStream);
         audioChunks = [];
@@ -224,18 +234,25 @@ async function startRecording() {
         paused = false;
         recordStartTime = Date.now();
         
+        console.log('✅ Microphone acquired, starting MediaRecorder');
+        
         // Process audio in 1-second chunks for live streaming
         mediaRecorder.start(1000);
         
         // When each chunk is available
         mediaRecorder.ondataavailable = async (event) => {
+            console.log('📦 Audio chunk received, size:', event.data.size, 'bytes');
             audioChunks.push(event.data);
             
             // Live stream: process chunk immediately
             if (enableLiveStream) {
+                console.log('🔄 Live streaming enabled, transcribing chunk...');
                 const transcription = await transcribeChunk(event.data);
+                console.log('📝 Transcription result:', transcription ? '✅ ' + transcription : '❌ null/empty');
+                
                 if (transcription) {
                     currentText += (currentText ? ' ' : '') + transcription;
+                    console.log('💬 Current full text:', currentText);
                     displayLiveText(transcription);
                     
                     // Translate if enabled
@@ -251,13 +268,19 @@ async function startRecording() {
                     if (enableMeetings) {
                         checkForMeetings(transcription);
                     }
+                } else {
+                    console.warn('⚠️ Transcription was null/empty');
                 }
+            } else {
+                console.log('⚠️ Live streaming DISABLED - chunks not being processed');
             }
         };
         
         mediaRecorder.onstop = function() {
+            console.log('⏹️ Recording stopped');
             // If not live streaming, process now
             if (!enableLiveStream) {
+                console.log('Processing all audio at once...');
                 processAllAudio();
             }
         };
@@ -268,7 +291,9 @@ async function startRecording() {
         
     } catch (error) {
         alert('Microphone access denied');
-        console.error(error);
+        console.error('❌ Error starting recording:', error);
+    }
+}
     }
 }
 
@@ -293,31 +318,48 @@ function togglePause() {
 
 // TRANSCRIPTION
 async function transcribeChunk(chunk) {
-    // READ API KEY FRESH FROM LOCALSTORAGE EACH TIME
+    // READ API KEY FRESH FROM LOCALSTORAGE EACH TIME (not just once at startup)
     const freshKey = localStorage.getItem('groqKey') || '';
     
+    console.log('🔑 Checking API key...');
+    console.log('freshKey exists:', freshKey ? '✅ YES (' + freshKey.substring(0, 15) + '...)' : '❌ NO');
+    
     if (!freshKey) {
-        console.error('❌ Groq API key not set. Go to Settings and add your key.');
+        console.error('❌ CRITICAL: Groq API key not set. Go to Settings and add your key.');
         return null;
     }
     
     try {
+        console.log('📤 Creating FormData and sending to Groq API...');
         const formData = new FormData();
         formData.append('file', chunk, 'audio.webm');
         formData.append('model', 'whisper-large-v3-turbo');
         
+        console.log('🌐 Fetching from:', GROQ_API);
         const response = await fetch(GROQ_API, {
             method: 'POST',
-            headers: { 'Authorization': `Bearer ${freshKey}` }, 
+            headers: { 'Authorization': `Bearer ${freshKey}` },  // USE FRESH KEY
             body: formData
         });
         
-        if (!response.ok) return null;
+        console.log('📥 Response status:', response.status, response.statusText);
+        
+        if (!response.ok) {
+            console.error('❌ API returned error:', response.status, response.statusText);
+            const errorText = await response.text();
+            console.error('Error details:', errorText);
+            return null;
+        }
+        
         const data = await response.json();
+        console.log('✅ Got response from Groq:', data);
+        console.log('📝 Transcribed text:', data.text || '(empty)');
+        
         return data.text;
         
     } catch (error) {
-        console.error('Transcription error:', error);
+        console.error('❌ Exception in transcribeChunk:', error.message);
+        console.error('Full error:', error);
         return null;
     }
 }
@@ -334,12 +376,22 @@ async function processAllAudio() {
 
 // DISPLAY
 function displayLiveText(text) {
+    console.log('🎨 displayLiveText called with:', text);
+    console.log('transcriptOriginal element exists:', transcriptOriginal ? '✅ YES' : '❌ NO');
+    
     const p = document.createElement('p');
     p.textContent = text;
     p.style.color = '#0066cc';
     p.style.fontWeight = '500';
+    
+    if (!transcriptOriginal) {
+        console.error('❌ CRITICAL: transcriptOriginal element not found!');
+        return;
+    }
+    
     transcriptOriginal.appendChild(p);
     transcriptOriginal.scrollTop = transcriptOriginal.scrollHeight;
+    console.log('✅ Text added to DOM, total items:', transcriptOriginal.children.length);
 }
 
 function displayLiveTranslation(text) {
@@ -518,17 +570,27 @@ function closeSettings() {
 }
 
 function saveSettings() {
+    console.log('💾 saveSettings called');
     groqKey = inputGroqKey.value;
     calendarKey = inputCalendarKey.value;
     translateKey = inputTranslateKey.value;
     enableMeetings = checkMeetings.checked;
     enableLiveStream = checkLiveStream.checked;
     
+    console.log('Saving to localStorage:');
+    console.log('  groqKey:', groqKey ? '✅ ' + groqKey.substring(0, 20) + '...' : '❌ empty');
+    console.log('  enableMeetings:', enableMeetings);
+    console.log('  enableLiveStream:', enableLiveStream);
+    
     localStorage.setItem('groqKey', groqKey);
     localStorage.setItem('calendarKey', calendarKey);
     localStorage.setItem('translateKey', translateKey);
     localStorage.setItem('enableMeetings', enableMeetings);
     localStorage.setItem('enableLiveStream', enableLiveStream);
+    
+    console.log('✅ All settings saved to localStorage');
+    console.log('Verify - reading back:');
+    console.log('  groqKey from localStorage:', localStorage.getItem('groqKey') ? '✅ exists' : '❌ missing');
     
     closeSettings();
     alert('Saved!');
@@ -592,20 +654,6 @@ async function loadHistory() {
     } catch (error) {
         console.error(error);
     }
-}
-
-// Add to app.js
-async function translateText(text, targetLang) {
-    const response = await fetch('https://libretranslate.de/translate', {
-        method: 'POST',
-        body: JSON.stringify({
-            q: text,
-            source: 'auto',
-            target: targetLang  // 'es', 'fr', 'de', etc.
-        }),
-        headers: { 'Content-Type': 'application/json' }
-    });
-    return (await response.json()).translatedText;
 }
 
 console.log('Vocalis Phase 3 loaded');

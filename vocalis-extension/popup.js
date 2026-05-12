@@ -1,5 +1,8 @@
 // popup.js - Extension popup functionality
 
+console.log('=== VOCALIS EXTENSION POPUP ===');
+console.log('✅ popup.js loaded');
+
 // Get elements
 const groqKey = document.getElementById('groqKey');
 const calendarKey = document.getElementById('calendarKey');
@@ -22,7 +25,10 @@ let isHighContrast = false;
 let isDyslexiaMode = false;
 
 // Load settings on popup open
-document.addEventListener('DOMContentLoaded', loadSettings);
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('📖 popup.js DOMContentLoaded');
+    loadSettings();
+});
 
 // Save settings when button clicked
 btnSave.addEventListener('click', saveSettings);
@@ -88,6 +94,7 @@ btnDyslexia.addEventListener('click', () => {
 
 // Load settings from Chrome storage
 function loadSettings() {
+    console.log('📂 loadSettings called');
     chrome.storage.sync.get(
         {
             groqKey: '',
@@ -99,6 +106,11 @@ function loadSettings() {
             enableLiveStream: true
         },
         (items) => {
+            console.log('✅ Settings loaded from Chrome storage:');
+            console.log('  groqKey:', items.groqKey ? '✅ ' + items.groqKey.substring(0, 20) + '...' : '❌ empty');
+            console.log('  enableMeetings:', items.enableMeetings);
+            console.log('  enableLiveStream:', items.enableLiveStream);
+            
             groqKey.value = items.groqKey;
             groqKey.type = 'password';  // Show as dots ••••••
             calendarKey.value = items.calendarKey;
@@ -109,12 +121,17 @@ function loadSettings() {
             translateLang.value = items.translateLang;
             enableMeetings.checked = items.enableMeetings;
             enableLiveStream.checked = items.enableLiveStream;
+            
+            console.log('✅ UI updated with loaded settings');
         }
     );
 }
 
 // Save settings to Chrome storage
 function saveSettings() {
+    console.log('💾 saveSettings called');
+    console.log('  groqKey value:', groqKey.value ? '✅ ' + groqKey.value.substring(0, 20) + '...' : '❌ empty');
+    
     if (!groqKey.value) {
         showStatus('⚠️ Groq API key is required', false);
         return;
@@ -130,7 +147,10 @@ function saveSettings() {
         enableLiveStream: enableLiveStream.checked
     };
 
+    console.log('Saving to Chrome storage:', settings);
+    
     chrome.storage.sync.set(settings, () => {
+        console.log('✅ Settings saved to Chrome storage');
         showStatus('✓ Settings saved', true);
         
         // Hide message after 2 seconds

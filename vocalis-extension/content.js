@@ -2,7 +2,9 @@
 // Creates floating button that opens Ava-style recording UI
 
 if (chrome && chrome.runtime) {
-  console.log('Vocalis content script loaded on:', window.location.hostname);
+  console.log('=== VOCALIS CONTENT SCRIPT ===');
+  console.log('✅ Vocalis content script loaded on:', window.location.hostname);
+  console.log('Chrome runtime available:', chrome && chrome.runtime ? '✅ YES' : '❌ NO');
   
   // Create floating button (circle, top center-right)
   const btn = document.createElement('button');
@@ -40,9 +42,11 @@ if (chrome && chrome.runtime) {
   
   btn.addEventListener('click', toggleVocalisRecorder);
   document.body.appendChild(btn);
+  console.log('✅ Floating button created and added to page');
   
   // ========== AVA-STYLE RECORDING UI ==========
   function toggleVocalisRecorder() {
+    console.log('🎤 Floating button clicked');
     const overlay = document.getElementById('vocalis-recorder-overlay');
     
     if (overlay) {
